@@ -1,4 +1,5 @@
 import { MAX_UPLOAD_BYTES, splitAudio } from "@/lib/audio-chunks";
+import { MAX_DOCUMENT_BYTES } from "@/lib/document-input";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { prepareLesson } from "@/lib/preparation.functions";
@@ -184,7 +185,7 @@ function NewLesson() {
         <TabsContent value="paste" className="pt-3">
           <p className="text-xs text-muted-foreground">{t.pasteHint}</p>
         </TabsContent>
-        <TabsContent value="document" className="py-6"><Input type="file" aria-label={t.sourceDocument} accept=".pdf,.docx,.pptx,.txt,.md,.csv" disabled={captureBusy} onChange={async e=>{const file=e.target.files?.[0];e.target.value="";if(!file)return;setPhase("transcribing");try{const { extractDocument }=await import("@/lib/document-input");const text=await extractDocument(file);setNotes(n=>(n?n+"\n\n":"")+text);}catch(err){toast.error((err as Error).message);}finally{setPhase("idle");}}}/></TabsContent>
+        <TabsContent value="document" className="py-6"><Input type="file" aria-label={t.sourceDocument} accept=".pdf,.docx,.pptx,.txt,.md,.csv" disabled={captureBusy} onChange={async e=>{const file=e.target.files?.[0];e.target.value="";if(!file)return;if(file.size>MAX_DOCUMENT_BYTES){toast.error(t.documentTooLarge);return;}setPhase("transcribing");try{const { extractDocument }=await import("@/lib/document-input");const text=await extractDocument(file);setNotes(n=>(n?n+"\n\n":"")+text);}catch(err){toast.error((err as Error).message);}finally{setPhase("idle");}}}/></TabsContent>
       </Tabs>
 
       <div className="space-y-2">

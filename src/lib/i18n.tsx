@@ -75,6 +75,7 @@ const en = {
   sourceMaterial: "Source material",
   preparationFailed: "Preparation stopped",
   sourceDocument: "Document",
+  documentTooLarge: "Documents must be smaller than 50 MB.",
   finishLesson: "Finish learning",
   lessonPaused: "Paused — ask Apollo a question or continue",
   prepareTopic: "Or prepare a topic",

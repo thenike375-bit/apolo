@@ -6,6 +6,7 @@ import {
   jsonError,
   requireApiKey,
 } from "./ai/gateway.server";
+import { z } from "zod";
 
 const MAX_AUDIO = 24 * 1024 * 1024;
 
@@ -13,7 +14,12 @@ const MAX_AUDIO = 24 * 1024 * 1024;
 export async function handleTranscribe(request: Request) {
   const auth = await authFromRequest(request);
   if (!auth) return jsonError(401, "Please sign in again.");
-  const form = await request.formData();
+  let form: FormData;
+  try {
+    form = await request.formData();
+  } catch {
+    return jsonError(400, "Invalid audio upload");
+  }
   const file = form.get("file");
   const language = form.get("language");
   if (!(file instanceof File)) return jsonError(400, "No audio received");
@@ -85,7 +91,14 @@ export async function handleTranscribe(request: Request) {
 export async function handleSpeech(request: Request) {
   const auth = await authFromRequest(request);
   if (!auth) return jsonError(401, "Please sign in again.");
-  const body = (await request.json().catch(() => ({}))) as { text?: string; voice?: string; stream?: boolean; lesson?: boolean };
+  const parsed = z.object({
+    text: z.string().max(20_000).optional(),
+    voice: z.string().max(20).optional(),
+    stream: z.boolean().optional(),
+    lesson: z.boolean().optional(),
+  }).safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return jsonError(400, "Invalid speech request");
+  const body = parsed.data;
   const text = (body.text ?? "").trim().slice(0, 2500);
   if (!text) return jsonError(400, "Nothing to read");
   const requestedVoice = body.voice ?? "";

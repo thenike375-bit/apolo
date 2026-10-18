@@ -1,5 +1,8 @@
 /** Browser-only document extraction: no source file is uploaded to a third party. */
+export const MAX_DOCUMENT_BYTES = 50 * 1024 * 1024;
+
 export async function extractDocument(file: File): Promise<string> {
+  if (file.size > MAX_DOCUMENT_BYTES) throw new Error("Document exceeds the 50 MB limit.");
   const name = file.name.toLowerCase();
   let text = "";
   if (/\.(txt|md|csv)$/.test(name)) text = await file.text();
@@ -8,15 +11,18 @@ export async function extractDocument(file: File): Promise<string> {
     const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
     pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
     const loading = pdfjs.getDocument({ data: await file.arrayBuffer() });
-    const doc = await loading.promise;
-    const pages: string[] = [];
-    for (let i=1;i<=doc.numPages;i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      pages.push(content.items.map(item=>"str" in item?item.str:"").join(" "));
+    try {
+      const doc = await loading.promise;
+      const pages: string[] = [];
+      for (let i=1;i<=doc.numPages;i++) {
+        const page = await doc.getPage(i);
+        const content = await page.getTextContent();
+        pages.push(content.items.map(item=>"str" in item?item.str:"").join(" "));
+      }
+      text = pages.join("\n\n");
+    } finally {
+      await loading.destroy().catch(() => {});
     }
-    text = pages.join("\n\n");
-    await loading.destroy();
   } else if (name.endsWith(".docx")) {
     const mammoth = await import("mammoth/mammoth.browser");
     text = (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value;
