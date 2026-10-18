@@ -1,4 +1,4 @@
-import { desktopCapturer, systemPreferences, type Session } from "electron";
+import { systemPreferences, type Session } from "electron";
 
 const MEDIA_PERMISSIONS = new Set(["media", "audioCapture", "videoCapture", "display-capture"]);
 
@@ -39,14 +39,13 @@ async function askDarwinMedia(
 
 export function installPermissionHandlers(ses: Session, getAppUrl: () => string): void {
   ses.setPermissionCheckHandler((_contents, permission, requestingOrigin) => {
-    if (!MEDIA_PERMISSIONS.has(permission)) return true;
-    return sameOrigin(requestingOrigin, getAppUrl());
+    return MEDIA_PERMISSIONS.has(permission) && sameOrigin(requestingOrigin, getAppUrl());
   });
 
   ses.setPermissionRequestHandler((_contents, permission, callback, details) => {
     const requestingUrl = details.requestingUrl || ("securityOrigin" in details ? details.securityOrigin ?? "" : "");
-    if (!MEDIA_PERMISSIONS.has(permission)) {
-      callback(true);
+    if (!MEDIA_PERMISSIONS.has(permission) || !("isMainFrame" in details && details.isMainFrame)) {
+      callback(false);
       return;
     }
     if (!sameOrigin(requestingUrl, getAppUrl())) {
@@ -59,16 +58,7 @@ export function installPermissionHandlers(ses: Session, getAppUrl: () => string)
   });
 
   ses.setDisplayMediaRequestHandler((_request, callback) => {
-    void desktopCapturer
-      .getSources({ types: ["screen", "window"] })
-      .then((sources) => {
-        const source = sources[0];
-        if (!source) {
-          callback({});
-          return;
-        }
-        callback({ video: source });
-      })
-      .catch(() => callback({}));
+    // No app feature currently captures the desktop. Never silently grant a screen source.
+    callback({});
   });
 }

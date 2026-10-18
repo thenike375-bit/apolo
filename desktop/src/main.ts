@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, ipcMain, session, shell } from "electron";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { isLocalUrl, resolveAppUrl, saveAppUrl } from "./app-url";
 import { installPermissionHandlers } from "./permissions";
@@ -46,13 +47,8 @@ function createWindow(): BrowserWindow {
           width: 960,
           height: 720,
           autoHideMenuBar: true,
-          webPreferences: {
-            preload: preloadPath(),
-            partition: PARTITION,
-            sandbox: true,
-            contextIsolation: true,
-            nodeIntegration: false,
-          },
+          // OAuth popups can share the session, but must never receive the desktop bridge.
+          webPreferences: { partition: PARTITION, sandbox: true, contextIsolation: true, nodeIntegration: false },
         },
       };
     }
@@ -138,18 +134,26 @@ app.on("activate", () => {
   }
 });
 
-ipcMain.handle("desktop:get-app-url", () => {
+function isSetupSender(event: Electron.IpcMainInvokeEvent): boolean {
+  const frame = event.senderFrame;
+  return Boolean(frame && frame === event.sender.mainFrame && frame.url === pathToFileURL(setupPage()).href);
+}
+
+ipcMain.handle("desktop:get-app-url", (event) => {
+  if (!isSetupSender(event)) throw new Error("This desktop action is only available on the setup page.");
   return appUrl || resolveAppUrl(app.getAppPath(), app.getPath("userData"));
 });
 
-ipcMain.handle("desktop:save-app-url", async (_event, raw: unknown) => {
+ipcMain.handle("desktop:save-app-url", async (event, raw: unknown) => {
+  if (!isSetupSender(event)) throw new Error("This desktop action is only available on the setup page.");
   if (typeof raw !== "string") throw new Error("URL is required.");
   const url = saveAppUrl(app.getPath("userData"), raw);
   await loadApp(url);
   return url;
 });
 
-ipcMain.handle("desktop:retry", async () => {
+ipcMain.handle("desktop:retry", async (event) => {
+  if (!isSetupSender(event)) throw new Error("This desktop action is only available on the setup page.");
   await openResolvedUrl();
 });
 

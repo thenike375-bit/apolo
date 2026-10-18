@@ -1,14 +1,13 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("postfactumDesktop", {
-  platform: process.platform,
-  getAppUrl: () => ipcRenderer.invoke("desktop:get-app-url") as Promise<string>,
-  saveAppUrl: (url: string) => ipcRenderer.invoke("desktop:save-app-url", url) as Promise<string>,
-  retry: () => ipcRenderer.invoke("desktop:retry") as Promise<void>,
-});
-
 window.addEventListener("DOMContentLoaded", () => {
-  if (document.body?.dataset["postfactumSetup"] !== "true") return;
+  if (window.location.protocol !== "file:" || !window.location.pathname.endsWith("/setup.html") || document.body?.dataset["postfactumSetup"] !== "true") return;
+  contextBridge.exposeInMainWorld("postfactumDesktop", {
+    platform: process.platform,
+    getAppUrl: () => ipcRenderer.invoke("desktop:get-app-url") as Promise<string>,
+    saveAppUrl: (url: string) => ipcRenderer.invoke("desktop:save-app-url", url) as Promise<string>,
+    retry: () => ipcRenderer.invoke("desktop:retry") as Promise<void>,
+  });
   const form = document.querySelector("#form");
   const input = document.querySelector("#url");
   const error = document.querySelector("#error");
