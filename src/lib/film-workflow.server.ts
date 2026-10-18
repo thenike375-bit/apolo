@@ -96,7 +96,7 @@ export function filmWorkflowHandler() {
           return result;
         });
         let done = false;
-        for (let poll = 0; poll < 90; poll++) {
+        for (let poll = 0; ; poll++) {
           await step.sleep(`wait-${index}-${poll}`, "10s");
           const status = await step.run(`poll-${index}-${poll}`, async () => {
             await ensureActive();
@@ -131,7 +131,7 @@ export function filmWorkflowHandler() {
             break;
           }
         }
-        if (!done) throw new Error("Video is still processing after 15 minutes; preparation stopped without resubmitting footage.");
+        if (!done) throw new Error("Video preparation ended before the clip completed.");
       }
       await step.run("ready", async () => {
         await ensureActive();

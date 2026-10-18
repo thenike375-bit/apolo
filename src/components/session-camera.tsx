@@ -113,6 +113,9 @@ export function SessionCamera({
       setPresence("loading");
       setOn(true);
     } catch {
+      stream.current?.getTracks().forEach((track) => track.stop());
+      stream.current = null;
+      if (video.current) video.current.srcObject = null;
       toast.error(t.cameraDenied);
     } finally {
       setLoading(false);

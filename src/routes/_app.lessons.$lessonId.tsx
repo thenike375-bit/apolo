@@ -36,7 +36,7 @@ function LessonPage() {
   const navigate = useNavigate();
   const { start, busy: quizBusy } = useStartQuiz();
   const [retrying, setRetrying] = useState(false);
-  const { data: lesson, refetch } = useQuery({
+  const { data: lesson, refetch, isPending, isError } = useQuery({
     queryKey: ["lesson", lessonId],
     queryFn: async () => {
       const { data, error } = await supabase.from("lessons").select("*").eq("id", lessonId).maybeSingle();
@@ -45,7 +45,16 @@ function LessonPage() {
     },
   });
 
-  if (!lesson) return <div className="py-20 text-center text-muted-foreground">…</div>;
+  if (isPending) return <div className="py-20 text-center text-muted-foreground">…</div>;
+  if (isError || !lesson) return (
+    <div className="mx-auto max-w-xl space-y-4 py-20 text-center">
+      <p className="text-muted-foreground">{isError ? t.pageLoadError : t.quizLoadError}</p>
+      <div className="flex justify-center gap-2">
+        <Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button>
+        <Button variant="ghost" onClick={() => navigate({ to: "/lessons" })}>{t.backHome}</Button>
+      </div>
+    </div>
+  );
   const topics = (lesson.topics as unknown as Topic[]) ?? [];
   const points = (lesson.key_points as unknown as string[]) ?? [];
 

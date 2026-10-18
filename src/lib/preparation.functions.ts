@@ -74,7 +74,13 @@ export const resumeFilm = createServerFn({ method: "POST" }).middleware([require
     }
     const { data: row, error } = await context.supabase.from("prepared_lessons").update({ status: "queued", stage: "queued", error: null }).eq("id", data.id).eq("user_id", context.userId).eq("status", "failed").select("id").maybeSingle();
     if (error || !row) throw new Error("This film can't be resumed");
-    const { enqueueFilm } = await import("./film-workflow.server");
-    await enqueueFilm(row.id);
+    try {
+      const { enqueueFilm } = await import("./film-workflow.server");
+      await enqueueFilm(row.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Film queue failed";
+      await context.supabase.from("prepared_lessons").update({ status: "failed", stage: "failed", error: message.slice(0, 500) }).eq("id", row.id).eq("user_id", context.userId).eq("status", "queued");
+      throw error;
+    }
     return { ok: true };
   });

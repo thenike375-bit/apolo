@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { createThread, threadsQuery } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function ThreadList({ activeId, className }: { activeId?: string; className?: string }) {
   const { t } = useI18n();
@@ -14,12 +15,20 @@ export function ThreadList({ activeId, className }: { activeId?: string; classNa
   const { data: threads } = useQuery(threadsQuery());
 
   async function add() {
-    const id = await createThread(t.newChatTitle);
-    await qc.invalidateQueries({ queryKey: ["threads"] });
-    navigate({ to: "/chat/$threadId", params: { threadId: id } });
+    try {
+      const id = await createThread(t.newChatTitle);
+      await qc.invalidateQueries({ queryKey: ["threads"] });
+      navigate({ to: "/chat/$threadId", params: { threadId: id } });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t.pageLoadError);
+    }
   }
   async function remove(id: string) {
-    await supabase.from("threads").delete().eq("id", id);
+    const { error } = await supabase.from("threads").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await qc.invalidateQueries({ queryKey: ["threads"] });
     if (id === activeId) navigate({ to: "/chat" });
   }

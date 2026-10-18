@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { memoriesQuery } from "@/lib/queries";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({
@@ -36,8 +37,12 @@ function ProfilePage() {
   const { data: memories } = useQuery(memoriesQuery());
 
   async function remove(id: string) {
-    await supabase.from("memories").delete().eq("id", id);
-    qc.invalidateQueries({ queryKey: ["memories"] });
+    const { error } = await supabase.from("memories").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    await qc.invalidateQueries({ queryKey: ["memories"] });
   }
 
   return (

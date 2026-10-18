@@ -71,7 +71,7 @@ Known gaps/strengths of this student to target:\n${input.memories || "(none)"}`,
     providerOptions: lightReasoningOptions,
   });
   const out = await result.output;
-  return out.questions
+  const questions = out.questions
     .filter((q) => q.options.length >= 2)
     .slice(0, 8)
     .map((q) => ({
@@ -79,6 +79,8 @@ Known gaps/strengths of this student to target:\n${input.memories || "(none)"}`,
       options: q.options.slice(0, 4),
       correct_index: Math.min(Math.max(0, Math.round(q.correct_index)), Math.min(q.options.length, 4) - 1),
     }));
+  if (questions.length === 0) throw new Error("The quiz generator returned no usable questions. Please try again.");
+  return questions;
 }
 
 const actorSchema = z.object({
