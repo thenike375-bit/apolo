@@ -397,7 +397,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      claim_preparation: { Args: never; Returns: string }
       claim_preparation_job: {
         Args: { job_id: string; secret: string }
         Returns: boolean

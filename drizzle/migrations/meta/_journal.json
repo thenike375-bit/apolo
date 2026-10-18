@@ -92,6 +92,13 @@
       "when": 1792313160233,
       "tag": "0012_supabase_integrity_and_least_privilege",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792313387064,
+      "tag": "0013_remove_retired_preparation_triggers",
+      "breakpoints": true
     }
   ]
 }
