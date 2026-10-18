@@ -1,9 +1,5 @@
-import { APOLLO_POSES } from "@/lib/avatars";
+import { ApolloPuppet } from "@/components/apollo-puppet";
 import { cn } from "@/lib/utils";
-
-export function useTeacherImage() {
-  return APOLLO_POSES.talking;
-}
 
 export function TeacherAvatar({
   size = 40,
@@ -17,27 +13,19 @@ export function TeacherAvatar({
   className?: string;
 }) {
   return (
-    <img
-      src={APOLLO_POSES.talking}
-      alt="Apollo, your AI teacher"
-      width={size}
-      height={size}
-      style={{
-        width: size,
-        height: size,
-        ...(level > 0
-          ? {
-              transform: `scale(${1 + level * 0.08})`,
-              transition: "transform 60ms linear",
-            }
-          : {}),
-      }}
-      className={cn(
-        "shrink-0 rounded-full object-cover ring-2 ring-accent/40",
-        speaking && level === 0 && "animate-speaking",
-        className,
-      )}
-    />
+    <span
+      role="img"
+      aria-label="Apollo, your AI teacher"
+      style={{ width: size, height: size }}
+      className={cn("inline-flex shrink-0 items-center justify-center", className)}
+    >
+      <ApolloPuppet
+        action={speaking ? "point" : "idle"}
+        level={level}
+        mood={speaking ? "talking" : "happy"}
+        className={`size-full ${speaking && level === 0 ? "animate-speaking" : ""}`}
+      />
+    </span>
   );
 }
 
