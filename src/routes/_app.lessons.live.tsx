@@ -86,12 +86,15 @@ function LiveLesson() {
   const [cardIndex, setCardIndex] = useState(0);
   const [drawing, setDrawing] = useState(false);
   const [filmPlaying, setFilmPlaying] = useState(false);
+  const preparedStatus = prepared?.status;
+  const preparedFilmVersion = prepared?.film_version;
+  const preparedCompleted = prepared?.completed;
   useEffect(() => { if (prepared) setCardIndex(prepared.scene_index); }, [prepared?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!preparedId || !prepared || prepared.status !== "ready" || prepared.film_version > 0) return;
-    const timer = setTimeout(() => { void saveProgress({ data: { id: preparedId, index: cardIndex, completed: prepared.completed } }).catch(e => toast.error(e.message)); }, 350);
+    if (!preparedId || preparedStatus !== "ready" || (preparedFilmVersion ?? 0) > 0) return;
+    const timer = setTimeout(() => { void saveProgress({ data: { id: preparedId, index: cardIndex, completed: preparedCompleted ?? false } }).catch(e => toast.error(e.message)); }, 350);
     return () => clearTimeout(timer);
-  }, [cardIndex, preparedId, prepared?.status, saveProgress]);
+  }, [cardIndex, preparedId, preparedStatus, preparedFilmVersion, preparedCompleted, saveProgress]);
   const pendingSpeech = useRef("");
   const boardTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const topicRef = useRef(topic);
