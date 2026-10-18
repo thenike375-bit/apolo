@@ -382,7 +382,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "threads_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -395,6 +403,11 @@ export type Database = {
         Returns: boolean
       }
       reserve_ltx_demo: { Args: { job_id: string }; Returns: boolean }
+      retry_preparation: { Args: { job_id: string }; Returns: string | null }
+      mark_preparation_enqueue_failed: {
+        Args: { job_id: string; failure_message: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

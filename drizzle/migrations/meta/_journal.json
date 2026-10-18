@@ -71,6 +71,27 @@
       "when": 1792295595527,
       "tag": "0009_ltx_demo_budget",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792312971332,
+      "tag": "0010_storage_buckets",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792313047000,
+      "tag": "0011_backfill_existing_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792313160233,
+      "tag": "0012_supabase_integrity_and_least_privilege",
+      "breakpoints": true
     }
   ]
 }

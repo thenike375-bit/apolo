@@ -30,7 +30,12 @@ export const prepareLesson = createServerFn({ method: "POST" }).middleware([requ
       const { enqueueFilm } = await import("./film-workflow.server");
       await enqueueFilm(row.id);
     } catch (error) {
-      await context.supabase.from("prepared_lessons").update({ status: "failed", stage: "failed", error: error instanceof Error ? error.message : "Film queue failed" }).eq("id", row.id);
+      const message = error instanceof Error ? error.message : "Film queue failed";
+      const { error: stateError } = await context.supabase.rpc("mark_preparation_enqueue_failed", {
+        job_id: row.id,
+        failure_message: message,
+      });
+      if (stateError) console.error("Failed to mark preparation enqueue failure", stateError);
       throw error;
     }
     return row;
@@ -72,14 +77,18 @@ export const resumeFilm = createServerFn({ method: "POST" }).middleware([require
       const { requireLtxKey } = await import("./ltx-video.server");
       requireLtxKey();
     }
-    const { data: row, error } = await context.supabase.from("prepared_lessons").update({ status: "queued", stage: "queued", error: null }).eq("id", data.id).eq("user_id", context.userId).eq("status", "failed").select("id").maybeSingle();
-    if (error || !row) throw new Error("This film can't be resumed");
+    const { data: restartedId, error } = await context.supabase.rpc("retry_preparation", { job_id: data.id });
+    if (error || !restartedId) throw new Error("This film can't be resumed");
     try {
       const { enqueueFilm } = await import("./film-workflow.server");
-      await enqueueFilm(row.id);
+      await enqueueFilm(restartedId);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Film queue failed";
-      await context.supabase.from("prepared_lessons").update({ status: "failed", stage: "failed", error: message.slice(0, 500) }).eq("id", row.id).eq("user_id", context.userId).eq("status", "queued");
+      const { error: stateError } = await context.supabase.rpc("mark_preparation_enqueue_failed", {
+        job_id: restartedId,
+        failure_message: message,
+      });
+      if (stateError) console.error("Failed to mark resumed preparation enqueue failure", stateError);
       throw error;
     }
     return { ok: true };
