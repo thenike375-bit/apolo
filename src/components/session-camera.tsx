@@ -87,7 +87,7 @@ export function SessionCamera({
   useEffect(() => {
     if (autoStart && !ended) void toggle();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoStart]);
+  }, [autoStart, ended]);
 
   async function toggle() {
     if (on) {
