@@ -139,6 +139,7 @@ function NewLesson() {
   }
 
   const working = phase !== "idle";
+  const captureBusy = working || rec === "recording";
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
@@ -171,7 +172,7 @@ function NewLesson() {
               type="file"
               accept="audio/*"
               className="hidden"
-              disabled={working}
+              disabled={captureBusy}
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) addTranscript(f);
@@ -183,7 +184,7 @@ function NewLesson() {
         <TabsContent value="paste" className="pt-3">
           <p className="text-xs text-muted-foreground">{t.pasteHint}</p>
         </TabsContent>
-        <TabsContent value="document" className="py-6"><Input type="file" aria-label={t.sourceDocument} accept=".pdf,.docx,.pptx,.txt,.md,.csv" disabled={working} onChange={async e=>{const file=e.target.files?.[0];e.target.value="";if(!file)return;setPhase("transcribing");try{const { extractDocument }=await import("@/lib/document-input");const text=await extractDocument(file);setNotes(n=>(n?n+"\n\n":"")+text);}catch(err){toast.error((err as Error).message);}finally{setPhase("idle");}}}/></TabsContent>
+        <TabsContent value="document" className="py-6"><Input type="file" aria-label={t.sourceDocument} accept=".pdf,.docx,.pptx,.txt,.md,.csv" disabled={captureBusy} onChange={async e=>{const file=e.target.files?.[0];e.target.value="";if(!file)return;setPhase("transcribing");try{const { extractDocument }=await import("@/lib/document-input");const text=await extractDocument(file);setNotes(n=>(n?n+"\n\n":"")+text);}catch(err){toast.error((err as Error).message);}finally{setPhase("idle");}}}/></TabsContent>
       </Tabs>
 
       <div className="space-y-2">
@@ -194,7 +195,7 @@ function NewLesson() {
       <p className="text-xs text-muted-foreground">{t.filmBilling}</p>
       <p className="border-l-2 border-accent pl-3 text-xs text-muted-foreground">{t.demoCreditsNotice}</p>
 
-      <Button size="lg" className="w-full rounded-xl" disabled={working || notes.trim().length < 20} onClick={analyze}>
+      <Button size="lg" className="w-full rounded-xl" disabled={captureBusy || notes.trim().length < 20} onClick={analyze}>
         {working && <Loader2 className="size-4 animate-spin" />}
         {phase === "transcribing" ? t.transcribing : phase === "analyzing" ? t.analyzing : t.videoMake}
       </Button>

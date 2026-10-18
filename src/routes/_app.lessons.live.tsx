@@ -62,7 +62,7 @@ function LiveLesson() {
   const { prepared: preparedId } = Route.useSearch();
   const saveProgress = useServerFn(saveLearningProgress);
   const filmPlayer = useRef<FilmPlayerHandle>(null);
-  const { data: prepared, isPending: preparedPending } = useQuery({ queryKey: ["prepared", preparedId], enabled: Boolean(preparedId), queryFn: async () => {
+  const { data: prepared, isPending: preparedPending, isError: preparedError, refetch: refetchPrepared } = useQuery({ queryKey: ["prepared", preparedId], enabled: Boolean(preparedId), queryFn: async () => {
     const { data, error } = await supabase.from("prepared_lessons").select(preparationColumns).eq("id", preparedId ?? "").maybeSingle();
     if (error) throw error;
     return data;
@@ -230,6 +230,8 @@ function LiveLesson() {
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-accent" />
         {t.livePrivacy}
       </p>
+      {preparedId && (preparedError || (!preparedPending && !prepared)) && <div role="alert" className="card-surface flex items-center justify-between gap-3 p-4 text-sm"><span>{t.preparationListError}</span><Button size="sm" variant="outline" onClick={() => void refetchPrepared()}>{t.retry}</Button></div>}
+      {preparedId && preparedPending && <p className="text-sm text-muted-foreground">{t.analyzing}</p>}
       <div className={`grid gap-5 ${film.length ? "lg:grid-cols-[4fr_1fr]" : "lg:grid-cols-[1.6fr_1fr]"}`}>
         <FullscreenStage lines={captions}>
           {preparedId ? film.length ? <FilmPlayer id={preparedId} ref={filmPlayer} connected={call.status === "connected"} starting={active} onStart={() => { setCameraEnded(false); setCaptions([]); setSeconds(null); setFeedback(null); spoken.current = ""; pendingSpeech.current = ""; call.start(); }} level={level} mood={mood} onPlayingChange={setFilmPlaying} onContext={(action,index,seconds,question)=>call.sendLesson(action,index,question,seconds)} /> : <div className="flex aspect-video items-center justify-center border border-border p-6 text-center text-muted-foreground">{t.filmUnavailable}</div> : <VisualBoard

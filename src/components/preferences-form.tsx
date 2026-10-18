@@ -73,7 +73,7 @@ export function PreferencesForm({
       teacher_voice: "Aoede",
       avatar_id: "apollo",
       avatar_url: null,
-      subjects: [],
+      subjects: p?.subjects ?? [],
       onboarded: true,
       updated_at: new Date().toISOString(),
     });

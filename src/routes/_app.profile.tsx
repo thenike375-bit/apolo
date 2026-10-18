@@ -73,7 +73,11 @@ function ProfilePage() {
         variant="outline"
         className="rounded-full"
         onClick={async () => {
-          await supabase.auth.signOut();
+          const { error } = await supabase.auth.signOut();
+          if (error) {
+            toast.error(error.message);
+            return;
+          }
           qc.clear();
           navigate({ to: "/" });
         }}

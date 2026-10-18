@@ -56,13 +56,13 @@ export function ExplainerVideo({ lessonId }: { lessonId: string | null }) {
           void make();
         }}
       >
-        <Input value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t.videoPlaceholder} />
+        <Input value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t.videoPlaceholder} maxLength={500} />
         <Button type="submit" disabled={loading || !user || busy || question.trim().length < 2}>
           {busy && <Loader2 className="size-4 animate-spin" />} {t.videoMake}
         </Button>
       </form>
       {busy && <p className="text-sm text-muted-foreground">{t.videoMaking}</p>}
-      {listError && <p role="alert" className="text-sm text-destructive">{t.preparationListError}</p>}
+      {listError && <div role="alert" className="flex items-center justify-between gap-3 text-sm text-destructive"><span>{t.preparationListError}</span><Button size="sm" variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>}
       <p className="text-xs text-muted-foreground">{t.filmBilling}</p>
       <p className="rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-xs">{t.demoCreditsNotice}</p>
       {preparations.map(row => <article key={row.id} className="flex flex-wrap items-center justify-between gap-3 border-l-2 border-accent pl-4 py-2">
