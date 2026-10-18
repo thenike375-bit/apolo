@@ -1,0 +1,2 @@
+CREATE OR REPLACE FUNCTION public.wake_preparation() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO public AS $$ BEGIN RETURN NEW; END; $$;
+COMMENT ON FUNCTION public.wake_preparation() IS 'DEPRECATED: cinematic film jobs are sent to the durable workflow service by authenticated enqueue.';

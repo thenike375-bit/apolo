@@ -1,0 +1,3 @@
+ALTER TABLE public.prepared_lessons ADD COLUMN film jsonb NOT NULL DEFAULT '[]'::jsonb, ADD COLUMN playback_seconds double precision NOT NULL DEFAULT 0, ADD COLUMN film_version integer NOT NULL DEFAULT 0;
+CREATE POLICY "Learners read own film clips" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'lesson-films' AND (storage.foldername(name))[1] = auth.uid()::text);
+COMMENT ON COLUMN public.prepared_lessons.scenes IS 'Legacy illustrated scenes; cinematic footage and timed storyboard are stored in film.';

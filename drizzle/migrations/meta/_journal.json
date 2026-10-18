@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792237359245,
+      "tag": "0000_postfactum_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792238933958,
+      "tag": "0001_teacher_avatar_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792265038562,
+      "tag": "0002_prepared_visual_lessons",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792265125138,
+      "tag": "0003_event_driven_preparation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792265511265,
+      "tag": "0004_preparation_callback_preview_address",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792266518281,
+      "tag": "0005_cinematic_film_timeline",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792266969266,
+      "tag": "0006_retire_illustrated_preparation_callbacks",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792267810301,
+      "tag": "0007_repair_prepared_film_column_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792290835187,
+      "tag": "0008_allow_apollo_avatar",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792295595527,
+      "tag": "0009_ltx_demo_budget",
+      "breakpoints": true
+    }
+  ]
+}

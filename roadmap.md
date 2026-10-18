@@ -1,0 +1,35 @@
+# Unified learning upgrade
+- [x] Analyze the app and LTX official pricing; connect the LTX key, implement four-shot 40-second 720p demos, a conservative $1.25 shared reservation guard, saved submission intents and no paid fallback; preserve legacy clips. Read-only LTX lookup returned job-not-found rather than authentication failure; 14 tests passed and signed-in library/live pages opened without page errors.
+- [ ] Verify LTX API balance, auto top-up disabled and account model access — provider exposes these through its console, not a documented balance endpoint; user must confirm the $1.25 is API credit rather than Studio credit.
+- [ ] Verify one complete LTX film through production workflow — needs publishing/syncing the updated Inngest handler and explicit approval to spend the estimated $1.20 video cost plus separate storyboard/voice credits; no video generation started.
+- [ ] Repair existing calculus media playback — signed-in sandbox media element reports unsupported source (code 4), with no JavaScript page error; cause remains unverified, separate from LTX migration.
+- [ ] Connect free Gemini video generation — key saved and authentication verified; its model catalog exposes no video models. No paid generation started; waiting for an available video service and explicit cost approval.
+- [x] Add real Apollo narration to regular lesson boards with audio-driven mouth, pause/resume and reusable replay audio; authenticated speech returned 200, animated mouth and pause/resume verified, three narration tests passed.
+- [x] Implement a 20-minute preparation deadline including queue time; remove all four waiting requests and verify none remain.
+- [x] Enrich Apollo's rigged expressions and chalk gestures, retaining local camera privacy and explicit learner feedback; signed-in board and four expressions visually checked.
+- [x] Clarify the unverified OpenAI Decisions service; no photo-based emotion inference or external photo transfer added. Deadline and lesson tests: 18 passed.
+- [ ] Verify the new durable expiry and complete film workflow after publishing and syncing both Inngest functions — blocked by unpublished app and unreachable external callbacks.
+- [x] Restore missing film-column SELECT grants; keep callback secret unreadable and revoke guest privileges.
+- [x] Verify real signed-in preparation creation, saved owner, Inngest enqueue, rejected invalid/missing tokens and forged ownership.
+- [ ] Verify cross-student read/update against an actual second student's preparation — no second-owner preparation exists; ownership reassignment and foreign-owner inserts are verified denied.
+- [x] Implement real video generation, private clip storage and Inngest durable preparation; retired old illustration callback.
+- [x] Implement timestamped storyboard, live-context updates, interruption pause and saved film time.
+- [x] Disclose YouTube frames inaccessible; no visual-style analysis claimed.
+- [x] Verify actual video generation: Pompeii MP4 completed, 8.04 seconds, frame inspected; 20 tests pass.
+- [ ] Activate and verify full durable film preparation — Inngest production sync rejects localhost and private preview blocks callbacks; needs published endpoint and Inngest sync.
+- [ ] Verify full film playback and audible live synchronization/interruptions — needs completed full workflow and real microphone/WebRTC browser.
+- [x] Save prepared lessons and progress; connect them to existing Apollo calls.
+- [x] Add source document input and preparation stages without autoplay.
+- [x] Implement narration scene markers, interruption, replay and resume controls.
+- [x] Replace emoji scenes with illustrated environments, ship cutaways and rigged Apollo.
+- [x] Verify preparation and saved resume through the signed-in UI (eight real Titanic scenes; scene 2 survived reload).
+- [ ] Verify audible scene synchronization and question interruptions — sandbox WebRTC ICE gathering timeout; requires a real microphone browser.
+- [ ] Verify close-and-return preparation through Inngest — requires a published and synced workflow endpoint; replaces the retired database callback.
+
+# Requested upgrades
+- [x] Dark visual redesign
+- [x] Four teacher avatars and private custom uploads
+- [x] Bilingual voice previews
+- [x] Live lesson camera, audio, transcript and self-reported learning feedback
+- [x] Verify saved avatars, private uploads, voice preview audio, onboarding controls, camera processing and authenticated relay startup/closure
+- [ ] Verify audible live back-and-forth, interruptions and delegation — blocked by sandbox WebRTC ICE gathering timeout; requires a real-browser microphone test

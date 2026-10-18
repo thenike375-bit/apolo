@@ -1,0 +1,53 @@
+{
+  "name": "postfactum-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Native desktop shell for the PostFactum website",
+  "main": "dist/main.js",
+  "author": "PostFactum",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && electron .",
+    "dev": "npm run build && electron . --dev",
+    "pack": "npm run build && electron-builder --win"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "typescript": "^5.8.3"
+  },
+  "build": {
+    "appId": "app.postfactum.desktop",
+    "productName": "PostFactum",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "config.json",
+      "setup.html",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "category": "public.app-category.education",
+      "extendInfo": {
+        "NSCameraUsageDescription": "PostFactum uses the camera for on-device lesson cues.",
+        "NSMicrophoneUsageDescription": "PostFactum uses the microphone for voice lessons."
+      }
+    }
+  }
+}
