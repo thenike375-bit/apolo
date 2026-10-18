@@ -62,8 +62,16 @@ function AuthPage() {
   }
 
   async function google() {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (r.error) toast.error(r.error.message ?? "Google sign-in failed");
+    if (busy) return;
+    setBusy(true);
+    try {
+      const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if (r.error) toast.error(r.error.message ?? "Google sign-in failed");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Google sign-in failed");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -81,7 +89,7 @@ function AuthPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">{mode === "in" ? t.signIn : t.signUp}</h1>
           </div>
-          <Button variant="outline" className="mt-6 w-full rounded-xl" onClick={google}>
+          <Button variant="outline" className="mt-6 w-full rounded-xl" onClick={google} disabled={busy}>
             {t.continueGoogle}
           </Button>
           <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">

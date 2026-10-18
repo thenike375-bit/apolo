@@ -5,6 +5,8 @@ import { z } from "zod";
 import type { UIMessage } from "ai";
 import { ChatWindow } from "@/components/chat-window";
 import { ThreadList } from "@/components/thread-list";
+import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/chat/$threadId")({
@@ -23,6 +25,7 @@ export const Route = createFileRoute("/_app/chat/$threadId")({
 });
 
 function ThreadPage() {
+  const { t } = useI18n();
   const { threadId } = Route.useParams();
   const { q } = Route.useSearch();
   const thread = useQuery({
@@ -57,12 +60,15 @@ function ThreadPage() {
           </Link>
           <span className="truncate text-sm font-medium">{thread.data?.thread?.title}</span>
         </div>
-        {thread.isLoading ? (
+        {thread.isPending ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground">…</div>
         ) : thread.data?.thread ? (
           <ChatWindow key={threadId} threadId={threadId} initialMessages={thread.data.messages} initialPrompt={q} />
         ) : (
-          <div className="flex flex-1 items-center justify-center text-muted-foreground">Not found</div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
+            <p role="alert">{thread.isError ? t.pageLoadError : "Conversation not found."}</p>
+            {thread.isError && <Button variant="outline" onClick={() => void thread.refetch()}>{t.retry}</Button>}
+          </div>
         )}
       </div>
     </div>

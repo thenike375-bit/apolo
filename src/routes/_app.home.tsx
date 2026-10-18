@@ -7,6 +7,8 @@ import { QuizDialog } from "@/components/quiz-dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useI18n } from "@/lib/i18n";
 import { createThread, lessonsQuery, memoriesQuery, profileQuery, quizzesQuery } from "@/lib/queries";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
@@ -26,14 +28,20 @@ function HomePage() {
   const { t } = useI18n();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const profile = useQuery({ ...profileQuery(user?.id ?? ""), enabled: !!user });
   const lessons = useQuery(lessonsQuery());
   const quizzes = useQuery(quizzesQuery());
   const memories = useQuery(memoriesQuery());
 
   async function newChat() {
-    const id = await createThread(t.newChatTitle);
-    navigate({ to: "/chat/$threadId", params: { threadId: id } });
+    try {
+      const id = await createThread(t.newChatTitle);
+      await qc.invalidateQueries({ queryKey: ["threads"] });
+      navigate({ to: "/chat/$threadId", params: { threadId: id } });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t.pageLoadError);
+    }
   }
 
   const actionCls = "card-surface group flex items-center gap-4 p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lift";
@@ -84,6 +92,7 @@ function HomePage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">{t.recentLessons}</h2>
           <div className="card-surface divide-y divide-border">
+            {lessons.isError && <div role="alert" className="flex items-center justify-between gap-2 p-4 text-sm"><span>{t.pageLoadError}</span><Button size="sm" variant="outline" onClick={() => void lessons.refetch()}>{t.retry}</Button></div>}
             {(lessons.data ?? []).slice(0, 5).map((l) => (
               <Link key={l.id} to="/lessons/$lessonId" params={{ lessonId: l.id }} className="flex items-center justify-between p-4 hover:bg-muted/50">
                 <span>
@@ -99,6 +108,7 @@ function HomePage() {
         <section>
           <h2 className="mb-3 text-lg font-semibold">{t.recentQuizzes}</h2>
           <div className="card-surface divide-y divide-border">
+            {quizzes.isError && <div role="alert" className="flex items-center justify-between gap-2 p-4 text-sm"><span>{t.pageLoadError}</span><Button size="sm" variant="outline" onClick={() => void quizzes.refetch()}>{t.retry}</Button></div>}
             {(quizzes.data ?? []).slice(0, 5).map((q) => (
               <Link key={q.id} to="/quiz/$quizId" params={{ quizId: q.id }} className="flex items-center justify-between gap-3 p-4 hover:bg-muted/50">
                 <span className="font-medium">{q.topic}</span>

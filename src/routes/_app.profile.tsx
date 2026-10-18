@@ -34,7 +34,8 @@ function ProfilePage() {
   const { t } = useI18n();
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data: memories } = useQuery(memoriesQuery());
+  const memoriesQueryState = useQuery(memoriesQuery());
+  const { data: memories } = memoriesQueryState;
 
   async function remove(id: string) {
     const { error } = await supabase.from("memories").delete().eq("id", id);
@@ -57,6 +58,7 @@ function ProfilePage() {
         <h2 className="text-lg font-semibold">{t.memory}</h2>
         <p className="mb-3 text-sm text-muted-foreground">{t.memoryHelp}</p>
         <div className="card-surface divide-y divide-border">
+          {memoriesQueryState.isError && <div role="alert" className="flex items-center justify-between gap-2 p-4 text-sm"><span>{t.pageLoadError}</span><Button size="sm" variant="outline" onClick={() => void memoriesQueryState.refetch()}>{t.retry}</Button></div>}
           {(memories ?? []).map((m) => (
             <div key={m.id} className="flex items-start gap-3 p-4">
               <span className={`mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ${kindStyle[m.kind] ?? kindStyle["fact"]}`}>{m.kind}</span>

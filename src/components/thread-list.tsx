@@ -12,7 +12,8 @@ export function ThreadList({ activeId, className }: { activeId?: string; classNa
   const { t } = useI18n();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: threads } = useQuery(threadsQuery());
+  const threadsQueryState = useQuery(threadsQuery());
+  const { data: threads } = threadsQueryState;
 
   async function add() {
     try {
@@ -42,6 +43,7 @@ export function ThreadList({ activeId, className }: { activeId?: string; classNa
         </Button>
       </div>
       <div className="flex-1 space-y-0.5 overflow-y-auto px-2 pb-4">
+        {threadsQueryState.isError && <div role="alert" className="space-y-2 px-3 py-2 text-xs text-destructive"><p>{t.pageLoadError}</p><Button size="sm" variant="outline" onClick={() => void threadsQueryState.refetch()}>{t.retry}</Button></div>}
         {(threads ?? []).map((th) => (
           <div
             key={th.id}
